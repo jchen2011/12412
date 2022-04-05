@@ -1,0 +1,327 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+skinparam class {
+BackgroundColor LightGrey
+ArrowColor Black
+BorderColor Black
+BackgroundColor<<Foo>> DarkGrey
+}
+
+skinparam backgroundcolor Gray
+skinparam stereotypeCBackgroundColor YellowGreen
+
+class Brickanoid {
+-player : Paddle
+-level1 : Level
+-level2 : Level
+-level3 : Level
+-ball : Ball
+-screenWidth : int
+-screenHeight : int
+- currentLevelCount : int
+- isGameOngoing : boolean
+- playerWon : boolean
++ bricksInLevels : int[]
++ {static} allLevels : ArrayList<Level>
++ {static} score : int
++ {static} lives : int
++ {static} highscore : int
++ {static} liveText : OverlayText
++ {static} scoreText : OverlayText
++ {static} highscoreText : OverlayText
++ {static} currentLevel : Level
+- overlay : Overlay
++main(args : String[]) : void
++instantiateGameObjects() : void
++instantiateLevels() : void
++instantiateOverlayAndText() : void
++addLevelsToGame() : void
++removeGameObjects() : void
++startNewGame() : void
++resetScoreAndLives() : void
++resetLevelsArray() : void
++resetGameVariables() : void
++restartGameState() : void
++restartLevels() : void
++endGameAfterLoss() : void
++determineLevelStatus((collider : Collider) : void
++activePowerup((powerup : Powerup) : void
++ {static} updateHighscore() : void
++setupEntities : void
++setupGame() : void
++setupScenes() : void
++setActiveScene(id : int) : void
++getHighscoreFromText() : void
++replaceHighscore(replaceWith : String) : void
++getIsGameOngoing() : boolean
++setGameIsOngoing(isGameOngoing : boolean) : void
++getScreenWidth() : int
++getScreenHeight() : int
++getPlayerWon() : boolean
++setPlayerWon(playerWon : boolean) : void
+}
+
+class Paddle {
+-lives : int
+-brickanoid : Brickanoid
++Paddle(initialLocation : Coordinate2D, brickanoid : Brickanoid, lives : int) : Paddle
++onPressedKeysChange(pressedKeys : Set<KeyCode>) : void
++notifyBoundaryTouching(border : SceneBorder) : void
++resetGravityAndFriction() : void
++getLives() : int
++setLives() : void
+}
+
+class Brick {
+-hitPoints : int
++Brick(initialLocation : Coordinate2D, size : Size, resource : String) : Brick
++getHitPoints() : int
++onCollision(collidingObject : Collider) : void
++ {abstract} removeBrickFromField() : void
+}
+
+/' class BrickSprite {
+#BlickSprite(resource : String, initialLocation : Coordinate2D) : BrickSprite
+} '/
+
+class PowerupBrick {
++ PowerupBrick(initialLocation: Coordinate2D, size : Size, resource: String) : PowerupBrick
++ removeBrickFromField() : void
++ dropPowerup() : void
+}
+
+class SimpleBrick {
+SimpleBrick(initialLocation : Coordinate2D, size : Size, resource : String)
+removeBrickFromField() : void
+}
+
+class Ball {
+- speed : int
+- direction : int
+- brickanoid : Brickanoid
+- powerupHitBricksCounter : int
++ {static} amountOfBallsOnScreen : int
+- slowDownActive : boolean
++Ball(initialLocation : Coordinate2D, brickanoid : Brickanoid, speed : int, direction : int) : Ball
++onCollision(collider : Collider) : void
++notifyBoundaryCrossing(SceneBorder border) : void
++notifyBoundaryTouching(SceneBorder border) : void
++setSpeed(speed : int) : void
++activateSlowdown(powerup : Powerup) : void
++deactiveSlowdown() : void
++resetBall() : void
+}
+
+class Overlay {
+-scoreText : TextEntity
+-highscoreText : TextEntity
+-lifeText : TextEntity
+-brickanoid : Brickanoid
++Overlay(location : Coordinate2D, brickanoid : Brickanoid, lifeText : OverlayText, scoreText : OverlayText, highscoreText : OverlayText) : Overlay
++getScoreText() : TextEntity
++getHighscoreText() : TextEntity
++getLifeText() : TextEntity
+}
+
+abstract class MenuButton {
+#Brickanoid : brickanoid
++MenuButton(text : String, initialLocation : Coordinate2D, brickanoid : Brickanoid) : MenuButton
++onMouseEntered() : void
++onMouseExited() : void
+}
+
+class TextEntity #Physical {
+
+}
+
+class Level {
+- ball : Ball
+- brickanoid : Brickanoid
+- player : Paddle
+- overlay : Overlay
+- aantalBricks : int
+- backgroundImage : String
++Level(brickanoid : Brickanoid, player : Paddle, ball : Ball, overlay : Overlay, aantalBricks : int, backgroundImage : String) : Level
++setupScene() : void
++setupEntities() : void
++setupTileMaps() : void
++addEntity(yaegerEntity : YaegerEntity) : void
+}
+
+class BrickTilemap {
++BrickTilemap(location : Coordinate2D, size : Size, ) : BrickTilemap
++setupEntities() : void
++defineMap() : int[][]
+}
+
+class MenuScene {
+-Brickanoid : brickanoid
++MenuScene(brickanoid : Brickanoid) : MenuScene
++setupScene() : void
++setupEntities() : void
++setCursor() : void
++getWidth() : double
++getHeight() : double
+}
+
+class PlayButton {
++PlayButton(text : String, initialLocation : Coordinate2D, brickanoid : Brickanoid)
++onMouseButtonPressed(mouseButton : MouseButton, coordinate2D : Coordinate2D)
+}
+
+class QuitButton {
++QuitButton(text : String, initialLocation : Coordinate2D, brickanoid : Brickanoid)
++onMouseButtonPressed(mouseButton : MouseButton, coordinate2D Coordinate2D) : void
+}
+
+class Hitbox {
+-width : int
+-height : int
++Hitbox(initialLocation : Coordinate2D, width : int, height : int) : Hitbox
+}
+
+class PowerupMultiball {
++PowerupMultiball(resource: String, initialLocation : Coordinate2D) : PowerupMultiball
++activatePowerup() : void
+}
+
+class PowerupSlowdownBall {
++PowerupSlowdownBall(resource: String, initialLocation : Coordinate2D) : PowerupSlowdownBall
++activatePowerup() : void
+}
+
+class GameOverScene {
+-brickanoid : Brickanoid
++GameOverScene(brickanoid : Brickanoid) : Brickanoid
++setupScene() : void
++setupEntities() : void
+}
+
+abstract class Difficulty {
+
+}
+
+abstract class Powerup {
++Powerup(resource : String,initialLocation : Coordinate2D) : Powerup
++onCollision(collider : Collider) : void
++ {abstract} activatePowerup() : void
+}
+
+abstract class YaegerGame #Physical {
+
+}
+
+abstract class DynamicScene #Physical {
+
+}
+
+abstract class StaticScene #Physical {
+
+}
+
+abstract class DynamicSpriteEntity #Physical {
+
+}
+
+/'  abstract SpriteEntity #Physical {
+
+} '/
+
+abstract class TileMap #Physical {
+
+}
+
+abstract class RectangleEntity #Physical {
+
+}
+
+interface Collider #Physical {
+
+}
+
+interface Collided #Physical {
+
+}
+
+interface KeyListener #Physical {
+
+}
+
+interface SceneBorderTouchingWatcher #Physical {
+
+}
+
+interface SceneBorderCrossingWatcher #Physical {
+
+}
+
+interface Newtonian #Physical {
+
+}
+
+interface MouseButtonPressedListener #Physical {
+
+}
+
+interface MouseEnterListener #Physical{
+
+}
+
+interface MouseExitListener #Physical{
+
+}
+
+interface TileMapContainer #Physical {
+
+}
+
+YaegerGame <|.. Brickanoid
+Level "1..*" <-- "1" Brickanoid
+Powerup "0.." <-- "1" Brickanoid
+Difficulty "1..*" <-- "1" Brickanoid
+MenuScene "1..*" <-- "1" Brickanoid
+Ball "1..*" <-- "1" Brickanoid
+Paddle "1" <-- "1" Brickanoid
+GameOverScene "1" <-- "1" Brickanoid
+Overlay "1" <-- "1" Level
+DynamicScene <|.. Level
+TileMapContainer <|.. Level
+BrickTilemap "1" <-- "1" Level
+TextEntity "1..*" <-- "1" Overlay
+StaticScene <|.. MenuScene
+MenuButton "1..*" <-- "1" MenuScene
+TextEntity <|.. MenuButton
+MouseEnterListener <|.. MenuButton
+MouseExitListener <|.. MenuButton
+MouseButtonPressedListener <|.. MenuButton
+MenuButton <|-- QuitButton
+MenuButton <|-- PlayButton
+DynamicSpriteEntity <|.. Paddle
+Collider <|.. Paddle
+KeyListener <|.. Paddle
+SceneBorderTouchingWatcher <|.. Paddle
+Newtonian <|.. Paddle
+DynamicSpriteEntity <|.. Powerup
+Collided <|.. Powerup
+Newtonian <|.. Powerup
+Powerup <|-- PowerupSlowdownBall
+Powerup <|-- PowerupMultiball
+DynamicSpriteEntity <|.. Brick
+Collider <|.. Brick
+Collided <|.. Brick
+Brick <|-- SimpleBrick
+Brick <|-- PowerupBrick
+TileMap <|.. BrickTilemap
+/' SpriteEntity <|-- BrickSprite '/
+DynamicSpriteEntity <|.. Ball
+Collider <|.. Ball
+Collided <|.. Ball
+Newtonian <|.. Ball
+SceneBorderTouchingWatcher <|.. Ball
+SceneBorderCrossingWatcher <|.. Ball
+RectangleEntity <|.. Hitbox
+Collider <|.. Hitbox
+StaticScene <|.. GameOverScene
+
+@enduml
