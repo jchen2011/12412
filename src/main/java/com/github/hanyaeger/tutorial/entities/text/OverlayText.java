@@ -27,6 +27,10 @@ public class OverlayText extends DynamicTextEntity {
         this.setFont(Font.font("Roboto", FontWeight.SEMI_BOLD, 20));
     }
 
+    /**
+     * Sets a new value into the value variable and shows this on the overlay
+     * @param sentValue the value that you want to be updated to
+     */
     public void setOverlayText(int sentValue){
         this.value = sentValue;
         this.setText(text + ": " + value);

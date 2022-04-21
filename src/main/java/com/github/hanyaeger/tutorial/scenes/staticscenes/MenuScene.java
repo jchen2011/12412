@@ -26,8 +26,8 @@ public class MenuScene extends StaticScene {
     @Override
     public void setupScene(){
         setBackgroundAudio("audio/menu_theme.mp3");
-        setBackgroundAudioVolume(0);
-        setBackgroundImage("backgrounds/bg.jpg");
+        setBackgroundAudioVolume(0.2);
+        setBackgroundImage("backgrounds/background.jpg");
     }
 
     @Override

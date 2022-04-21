@@ -8,6 +8,7 @@ import com.github.hanyaeger.api.entities.SceneBorderTouchingWatcher;
 import com.github.hanyaeger.api.entities.impl.DynamicSpriteEntity;
 import com.github.hanyaeger.api.scenes.SceneBorder;
 import com.github.hanyaeger.api.userinput.KeyListener;
+import com.github.hanyaeger.api.userinput.MouseMovedListener;
 import com.github.hanyaeger.tutorial.Brickanoid;
 import com.github.hanyaeger.tutorial.entities.powerups.Powerup;
 import javafx.scene.input.KeyCode;
@@ -21,7 +22,7 @@ import java.util.Set;
  * @author Daniël Roth
  */
 
-public class Paddle extends DynamicSpriteEntity implements Collider, Collided, KeyListener, SceneBorderTouchingWatcher, Newtonian {
+public class Paddle extends DynamicSpriteEntity implements Collider, Collided, KeyListener, SceneBorderTouchingWatcher, Newtonian, MouseMovedListener {
     private final int MOVEMENT_SPEED = 6;
     private final double GRAVITY = 0;
     private final double FRICTION = 0.1;
@@ -67,33 +68,12 @@ public class Paddle extends DynamicSpriteEntity implements Collider, Collided, K
     public void onCollision(Collider collider) {
         if (collider instanceof Powerup powerup) {
             powerup.activatePowerup();
-
         }
     }
 
-    /**
-     * Resets the gravity and friction of the paddle
-     */
-    public void resetGravityAndFriction() {
-        setGravityConstant(GRAVITY);
-        setFrictionConstant(FRICTION);
-    }
-
-    /**
-     * Gets the amount of lives that are left over
-     *
-     * @return the current lives that are left over
-     */
-    public int getLives() {
-        return lives;
-    }
-
-    /**
-     * Sets the new lives that replaces the old lives
-     *
-     * @param lives the new lives that you want to replace
-     */
-    public void setLives(int lives) {
-        this.lives = lives;
+    @Override
+    public void onMouseMoved(Coordinate2D coordinate2D) {
+        double newPosX = coordinate2D.getX();
+        this.setAnchorLocationX(newPosX);
     }
 }

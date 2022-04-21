@@ -8,15 +8,9 @@ import com.github.hanyaeger.api.media.SoundClip;
 import com.github.hanyaeger.api.scenes.SceneBorder;
 import com.github.hanyaeger.tutorial.Brickanoid;
 import com.github.hanyaeger.tutorial.entities.brick.Brick;
-import com.github.hanyaeger.tutorial.entities.paddle.Paddle;
 import com.github.hanyaeger.tutorial.entities.powerups.Powerup;
-import com.github.hanyaeger.tutorial.entities.powerups.PowerupMultiball;
-import com.github.hanyaeger.tutorial.entities.powerups.PowerupSlowdownBall;
 import com.github.hanyaeger.tutorial.entities.randomnumber.RandomNumber;
 import com.github.hanyaeger.tutorial.scenes.dynamicscenes.Level;
-
-import java.util.Random;
-import java.util.Vector;
 
 /**
  * This class is responsible for making the ball object that does something based on a specific action
@@ -31,27 +25,26 @@ public class Ball extends DynamicSpriteEntity implements SceneBorderTouchingWatc
     private int direction;
     private Brickanoid brickanoid;
     private int powerupHitBricksCounter;
-    public static int amountOfBallsOnScreen = 0;
     private boolean slowDownActive;
+    private Level level;
 
-    public Ball(Coordinate2D initialLocation, Brickanoid brickanoid, int speed, int direction) {
+    public Ball(Coordinate2D initialLocation, Brickanoid brickanoid, int speed, int direction, Level level) {
         super("sprites/round_ball.png", initialLocation, new Size(10, 10));
-        System.out.println("new Ball: " + brickanoid);
         this.speed = speed;
         this.direction = direction;
         this.brickanoid = brickanoid;
+        this.level = level;
         this.powerupHitBricksCounter = 0;
         this.slowDownActive = false;
         setMotion(speed, direction);
         setGravityConstant(GRAVITY);
         setFrictionConstant(FRICTION);
-        amountOfBallsOnScreen++;
+        level.setBallsOnScreen(level.getBallsOnScreen() + 1);
     }
 
     @Override
     public void onCollision(Collider collider) {
         setDirection(-getDirection() + 180);
-        System.out.println("balls in level:" + amountOfBallsOnScreen);
 
         if (collider instanceof Brick) {
             SoundClip ballhitbrick = new SoundClip("audio/soundeffect_destroy_brick.mp3", 1);
@@ -77,7 +70,7 @@ public class Ball extends DynamicSpriteEntity implements SceneBorderTouchingWatc
         ballLeavesScreen.setVolume(0.15);
         ballLeavesScreen.play();
 
-        if (sceneBorder == SceneBorder.BOTTOM && amountOfBallsOnScreen <= 1) {
+        if (sceneBorder == SceneBorder.BOTTOM && level.getBallsOnScreen() <= 1) {
             if (Brickanoid.lives >= 1) {
                 Brickanoid.lives--;
                 Brickanoid.liveText.setOverlayText(Brickanoid.lives);
@@ -87,9 +80,9 @@ public class Ball extends DynamicSpriteEntity implements SceneBorderTouchingWatc
             if (Brickanoid.lives <= 0) {
                 brickanoid.endGameAfterLoss();
             }
-        } else if (amountOfBallsOnScreen > 1 && sceneBorder == SceneBorder.BOTTOM) {
+        } else if (level.getBallsOnScreen() > 1 && sceneBorder == SceneBorder.BOTTOM) {
             this.remove();
-            amountOfBallsOnScreen--;
+            level.setBallsOnScreen(level.getBallsOnScreen() - 1);
         }
     }
 
@@ -111,15 +104,6 @@ public class Ball extends DynamicSpriteEntity implements SceneBorderTouchingWatc
     }
 
     /**
-     * Sets the old speed to the new given speed
-     *
-     * @param speed the new current speed that replaces the old speed
-     */
-    public void setSpeed(int speed) {
-        setMotion(speed, direction);
-    }
-
-    /**
      * Actives the ball slowdown powerup, where the ball is significant slower than usual
      *
      * @param powerup the powerup that should be activated
@@ -134,7 +118,7 @@ public class Ball extends DynamicSpriteEntity implements SceneBorderTouchingWatc
     }
 
     /**
-     * Deactives the ball slowdown when there are no bricks left over
+     * Deactives the ball slowdown when there are no bricks left over in the level
      */
     public void deactivateSlowdown() {
         slowDownActive = false;
@@ -142,7 +126,7 @@ public class Ball extends DynamicSpriteEntity implements SceneBorderTouchingWatc
     }
 
     /**
-     * Resets the ball instance for the next level so that it would not fall en will start above the paddle
+     * Resets the ball and spawns it randomly above the paddle into the game, so that the game can start again. This will only be used when the ball got out of the screen below
      */
     public void resetBall() {
         powerupHitBricksCounter = 0;
@@ -153,12 +137,22 @@ public class Ball extends DynamicSpriteEntity implements SceneBorderTouchingWatc
         resetLocation();
     }
 
+    /**
+     * Resets the location of the ball to the middle of the screen
+     */
     public void resetLocation() {
         double newSpawnLocationX = brickanoid.getSCREEN_WIDTH() / 2.0;
         double newSpawnLocationY = brickanoid.getSCREEN_HEIGHT() / 2.0 + (brickanoid.getSCREEN_HEIGHT() / 4.0);
         this.setAnchorLocation(new Coordinate2D(newSpawnLocationX, newSpawnLocationY));
     }
 
+    /**
+     * Generates a random direction and chooses either the lowerbound or the upperbound.
+     * Lowerbound for the left-side and upperBound for the right-side.
+     * This will be used for shooting the ball after spawning the ball left or right.
+     *
+     * @return the random generated direction, either left or right
+     */
     public int generateRandomDirection() {
         int randomDirection = 0;
         int lowerBound = 135;
@@ -168,7 +162,7 @@ public class Ball extends DynamicSpriteEntity implements SceneBorderTouchingWatc
         if(randomDirectionNumber.getValue() == 1) {
             randomDirection = lowerBound;
         }
-        // We moeten nog kijken of we multiball wel in de game laten
+
         else if(randomDirectionNumber.getValue() == 2) {
             randomDirection = upperBound;
         }

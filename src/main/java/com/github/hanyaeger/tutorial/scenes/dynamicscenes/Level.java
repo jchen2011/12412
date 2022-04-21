@@ -14,7 +14,7 @@ import com.github.hanyaeger.tutorial.entities.overlay.Overlay;
 import com.github.hanyaeger.tutorial.entities.paddle.Paddle;
 
 /**
- * This class is responsible for making the levels in the brickanoid game
+ * This class is responsible for making all the levels in the Brickanoid game
  *
  * @author Johnny Chen
  * @author Daniël Roth
@@ -26,23 +26,29 @@ public class Level extends DynamicScene implements TileMapContainer {
     private Overlay overlay;
     private int aantalBricks;
     private BrickTileMap tiles;
-
+    private int ballsOnScreen;
     private String backgroundImage;
-    //public static int aantalBricks = 5;
 
-    public Level(Brickanoid brickanoid, Paddle player, Ball ball, Overlay overlay, int aantalBricks, String backgroundImage) {
+    public Level(Brickanoid brickanoid, Overlay overlay, int aantalBricks, String backgroundImage) {
+        final double PLAYER_START_X = 300;
+        final double PLAYER_START_Y = 700;
+        final double BALL_START_X = brickanoid.getSCREEN_WIDTH() / 2.0;
+        final double BALL_START_Y = brickanoid.getSCREEN_HEIGHT() / 2.0 + (brickanoid.getSCREEN_HEIGHT() / 4.0);
+        final int BALL_STARTING_SPEED = 7;
+        final int BALL_STARTING_DIRECTION = 145;
+
         this.brickanoid = brickanoid;
-        this.player = player;   // in deze klasse creeeren
-        this.ball = ball;       // in deze klasse creeeren
+        this.player = new Paddle(new Coordinate2D(PLAYER_START_X, PLAYER_START_Y), brickanoid, Brickanoid.lives);
+        this.ball = new Ball(new Coordinate2D(BALL_START_X, BALL_START_Y), brickanoid, BALL_STARTING_SPEED, BALL_STARTING_DIRECTION, this);
         this.overlay = overlay;
-        this.aantalBricks = aantalBricks;  // afleiden uit tilemap.getInstanceMap
+        this.aantalBricks = aantalBricks;
         this.backgroundImage = backgroundImage;
     }
 
     @Override
     public void setupScene() {
         setBackgroundAudio("audio/game_theme.mp3");
-        setBackgroundAudioVolume(0);
+        setBackgroundAudioVolume(0.2);
         setBackgroundImage(backgroundImage);
     }
 
@@ -57,11 +63,20 @@ public class Level extends DynamicScene implements TileMapContainer {
 
     @Override
     public void setupTileMaps() {
-        // fix hardcoded coordinaten
-        this.tiles = new GenerateBrickTileMap(new Coordinate2D(getWidth() / 25, getHeight() / 20), new Size(getWidth() - getWidth() / 20, getHeight() / 2 + getHeight() / 4), aantalBricks);
+        final double TILEMAP_STARTX = getWidth() / 25;
+        final double TILEMAP_STARTY = getHeight() / 20;
+        final double TILEMAP_WIDTH = getWidth() - getWidth() / 20;
+        final double TILEMAP_HEIGHT = getHeight() / 2 + getHeight() / 4;
+
+        this.tiles = new GenerateBrickTileMap(new Coordinate2D(TILEMAP_STARTX, TILEMAP_STARTY), new Size(TILEMAP_WIDTH, TILEMAP_HEIGHT), aantalBricks);
         addTileMap(tiles);
     }
 
+    /**
+     * Gets the remaining brick count that are left over in the brick tile map
+     *
+     * @return the amount of bricks that are remaining
+     */
     public int getRemainingBrickCount() {
         int amountOfBricks = 0;
         //if( tiles.getInstanceMap() == null ) { return -1; }
@@ -78,12 +93,14 @@ public class Level extends DynamicScene implements TileMapContainer {
     }
 
     /**
-     * Determines whether the current level still has bricks, if it does the currentscene stays the same, if it doesn't have any more bricks the next level get's set to the currentscene
+     * Determines whether the current level still has bricks, if it does the currentScene stays the same.
+     * If there are no bricks left over in the level, the current level will be ended.
+     *
      * @param brick the brick which gets collided by a ball
     */
     public void determineLevelStatus(Brick brick) {
         if (brick.getHitPoints() == 0 && Brickanoid.currentLevel.getRemainingBrickCount() == 0) {
-            // Eindig het huidige level wanneer er geen bricks meer over zijn
+            // Ends the current level when there are no bricks left
             brickanoid.skipToNextLevel();
         }
     }
@@ -91,5 +108,23 @@ public class Level extends DynamicScene implements TileMapContainer {
     @Override
     public void addEntity(YaegerEntity yaegerEntity) {
         super.addEntity(yaegerEntity);
+    }
+
+    /**
+     * Gets the amount of balls
+     *
+     * @return the amount of balls on the screen
+     */
+    public int getBallsOnScreen() {
+        return ballsOnScreen;
+    }
+
+    /**
+     * Sets the amount of balls
+     *
+     * @param ballsOnScreen the amount of balls that you want to have updated
+     */
+    public void setBallsOnScreen(int ballsOnScreen) {
+        this.ballsOnScreen = ballsOnScreen;
     }
 }

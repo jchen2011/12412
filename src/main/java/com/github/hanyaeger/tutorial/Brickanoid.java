@@ -4,9 +4,7 @@ import com.github.hanyaeger.api.Coordinate2D;
 import com.github.hanyaeger.api.Size;
 import com.github.hanyaeger.api.YaegerGame;
 import com.github.hanyaeger.api.media.SoundClip;
-import com.github.hanyaeger.tutorial.entities.ball.Ball;
 import com.github.hanyaeger.tutorial.entities.overlay.Overlay;
-import com.github.hanyaeger.tutorial.entities.paddle.Paddle;
 import com.github.hanyaeger.tutorial.entities.text.OverlayText;
 import com.github.hanyaeger.tutorial.scenes.dynamicscenes.Level;
 import com.github.hanyaeger.tutorial.scenes.staticscenes.GameOverScene;
@@ -17,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * This class is responsible for making the objects, levels, scenes, overlay and text for the brickanoid game.
+ * This class is responsible for making the objects, levels, scenes, overlay and text for the Brickanoid game.
  *
  * @author Johnny Chen
  * @author Daniël Roth
@@ -31,11 +29,9 @@ public class Brickanoid extends YaegerGame {
     private final int STARTING_AMOUNT_OF_BRICKS = 15;
     private final int LEVEL_BRICK_MULTIPLIER = 5;
 
-    private Paddle player;
     private Level level1;
     private Level level2;
     private Level level3;
-    private Ball ball;
     private boolean isGameOngoing = false;
     private boolean playerWon = true;
 
@@ -49,7 +45,6 @@ public class Brickanoid extends YaegerGame {
 
     public static Level currentLevel;
     private int currentLevelCount = 1;
-    private ArrayList<Level> levelsList = new ArrayList<>();
     public static ArrayList<Level> allLevels = new ArrayList<>();
     private int[] bricksInLevels = new int[AMOUNT_OF_LEVELS];
 
@@ -64,8 +59,8 @@ public class Brickanoid extends YaegerGame {
     public void setupGame() {
         setGameTitle("Brickanoid");
         setSize(new Size(SCREEN_WIDTH, SCREEN_HEIGHT));
-
         getHighscoreFromText();
+        resetBricksInLevelsArray();
     }
 
     @Override
@@ -99,40 +94,16 @@ public class Brickanoid extends YaegerGame {
     }
 
     /**
-     * Creates an instance of player and ball
-     */
-    // Methodes die alles te maken hebben met het instantieëren van objecten die nodig zijn voor het spel
-    public void instantiateGameObjects() {
-        final double PLAYER_START_X = 300;
-        final double PLAYER_START_Y = 700;
-        final double BALL_START_X = SCREEN_WIDTH / 2.0;
-        final double BALL_START_Y = SCREEN_HEIGHT / 2.0 + (SCREEN_HEIGHT / 4.0);
-        final int BALL_STARTING_SPEED = 7;
-        final int BALL_STARTING_DIRECTION = 145;
-
-        this.player = new Paddle(new Coordinate2D(PLAYER_START_X, PLAYER_START_Y), this, lives);
-        this.ball = new Ball(new Coordinate2D(BALL_START_X, BALL_START_Y), this, BALL_STARTING_SPEED, BALL_STARTING_DIRECTION);
-    }
-
-    /**
      * Creates an instance of the levels
      */
     public void instantiateLevels() {
-        resetLevelsArray();
-
-        this.level1 = new Level(this, player, ball, overlay, bricksInLevels[0], "backgrounds/level1bg.PNG");
-        this.level2 = new Level(this, player, ball, overlay, bricksInLevels[1], "backgrounds/level2bg.PNG");
-        this.level3 = new Level(this, player, ball, overlay, bricksInLevels[2], "backgrounds/level3bg.PNG");
-
-//        for (int i = 1; i < 4; i ++) {
-//            String levelPath = "backgrounds/level" + i % 4 + "bg.PNG";
-//            Level level = new Level(this, player, ball, overlay, bricksInLevels[i - 1], levelPath);
-//            levelsList.add(level);
-//        }
+        this.level1 = new Level(this, overlay, bricksInLevels[0], "backgrounds/level1background.PNG");
+        this.level2 = new Level(this, overlay, bricksInLevels[1], "backgrounds/level2background.PNG");
+        this.level3 = new Level(this, overlay, bricksInLevels[2], "backgrounds/level3background.PNG");
     }
 
     /**
-     * Creates an instance of overlay and text
+     * Creates the instances of overlay and text
      */
     public void instantiateOverlayAndText() {
         final double OVERLAY_TEXT_Y = 10;
@@ -142,7 +113,7 @@ public class Brickanoid extends YaegerGame {
         final double OVERLAY_X = 0;
         final double OVERLAY_Y = 0;
 
-        // instantieer alle text en stop deze in de constructor van de overlay
+        // makes an instance of all the text and puts this in the constructor of the overlay
         liveText = new OverlayText(new Coordinate2D(LIVE_TEXT_X, OVERLAY_TEXT_Y), "Lives", STARTING_AMOUNT_OF_LIVES);
         scoreText = new OverlayText(new Coordinate2D(SCORE_TEXT_X, OVERLAY_TEXT_Y), "Score", score);
         highscoreText = new OverlayText(new Coordinate2D(HIGHSCORE_TEXT_X, OVERLAY_TEXT_Y), "Highscore", highscore);
@@ -150,9 +121,10 @@ public class Brickanoid extends YaegerGame {
     }
 
     /**
-     * Adds all the levels to the game
+     * Fills each cell in the brickInLevels array with a number
+     * A BrickTileMap object receives a cell from this array, this number determines how many bricks spawn inside a certain level
      */
-    public void resetLevelsArray() {
+    public void resetBricksInLevelsArray() {
         for (int i = 0; i < AMOUNT_OF_LEVELS; i++) {
             bricksInLevels[i] = STARTING_AMOUNT_OF_BRICKS + (i * LEVEL_BRICK_MULTIPLIER);
         }
@@ -162,25 +134,12 @@ public class Brickanoid extends YaegerGame {
      * Add all newly instantiated levels to the static allLevels ArrayList, these levels can be accessed by game objects if new objects need to be added to the current level
      */
     public void addLevelsToGame() {
-//        for(int i = 1; i < 4; i++) {
-//            Level l = levelsList.get(i - 1);
-//            addScene(i, l);
-//            Brickanoid.allLevels.set(i, l);
-//        }
         addScene(1, level1);
         Brickanoid.allLevels.set(1, level1);
         addScene(2, level2);
         Brickanoid.allLevels.set(2, level2);
         addScene(3, level3);
         Brickanoid.allLevels.set(3, level3);
-    }
-
-    /**
-     * Removes all the player and ball objects
-     */
-    public void removeGameObjects() {
-        player.remove();
-        ball.remove();
     }
 
     /**
@@ -196,10 +155,9 @@ public class Brickanoid extends YaegerGame {
     /**
      * Restarts the score and lives, create the instance of the game objects and create the instance of the overlay and text
      */
-    // Methodes om het spel op te zetten
+    // Methods to set up the game
     public void restartGameState() {
         resetGameVariables();
-        instantiateGameObjects();
         instantiateOverlayAndText();
     }
 
@@ -212,7 +170,6 @@ public class Brickanoid extends YaegerGame {
         restartLevels();
         setActiveScene(1);
         setIsGameOngoing(true);
-
         SoundClip startnewgame = new SoundClip("audio/start_game2.mp3", 1);
         startnewgame.setVolume(0.15);
         startnewgame.play();
@@ -235,12 +192,21 @@ public class Brickanoid extends YaegerGame {
         setActiveScene(currentLevelCount);
         scoreText.setOverlayText(score);
         highscoreText.setOverlayText(highscore);
-        Ball.amountOfBallsOnScreen = 1;
         lives = STARTING_AMOUNT_OF_LIVES;
-        player.resetGravityAndFriction();
-        ball.resetBall();
     }
 
+    /**
+     * Ends the game after a loss with the losing screen and a losing sound
+     */
+    public void endGameAfterLoss() {
+        SoundClip gameover = new SoundClip("audio/game_over.mp3", 1);
+        gameover.setVolume(0.15);
+        gameover.play();
+
+        setPlayerWon(false);
+        setIsGameOngoing(false);
+        setActiveScene(AMOUNT_OF_LEVELS + 1);
+    }
 
     /**
      * Updates the highscore when score is higher than highscore
@@ -253,26 +219,13 @@ public class Brickanoid extends YaegerGame {
         }
     }
 
-
-    public void endGameAfterLoss() {
-        SoundClip gameover = new SoundClip("audio/game_over.mp3", 1);
-        gameover.setVolume(0.15);
-        gameover.play();
-
-        setPlayerWon(false);
-        Ball.amountOfBallsOnScreen = 0;
-        removeGameObjects();
-        setIsGameOngoing(false);
-        setActiveScene(AMOUNT_OF_LEVELS + 1);
-    }
-
     /**
      * Reads the highscore from the text file and prints an error if there is nothing in the file, or no file
      */
     public void getHighscoreFromText() {
-        // Try catch block om de highscores text file in te lezen en wanneer er een error is dan wordt een error in de console geschreven
+        // A try catch block for reading the highscores from the text file. When there is an error, there will be an error printed out in the console
         try {
-            // Instantiëer een scanner en lees hiermee de highscore uit.
+            // Makes an instance of scanner ands reads the highscore with the scanner
             File highscores = new File("src/main/resources/highscoretext/highscores.txt");
             Scanner scanner = new Scanner(highscores);
 
@@ -292,7 +245,7 @@ public class Brickanoid extends YaegerGame {
      * @param replaceWith the new highscore that is replacing the old highscore
      */
     public static void replaceHighscore(String replaceWith) {
-        // Controleert of de spel bezig, zo niet dan wordt de highscore overschreven
+
         try {
             // input the (modified) file content to the StringBuffer "input"
             BufferedReader file = new BufferedReader(new FileReader("src/main/resources/highscoretext/highscores.txt"));
@@ -306,12 +259,12 @@ public class Brickanoid extends YaegerGame {
             }
             file.close();
 
-            // Schrijft een nieuwe string met het vervangen regel OVER dezelfde file
+            // Writes a new string with the replaced rule in the same file
             FileOutputStream fileOut = new FileOutputStream("src/main/resources/highscoretext/highscores.txt");
             fileOut.write(inputBuffer.toString().getBytes());
             fileOut.close();
 
-            // Error message
+            // Error message printed out when there is an error
         } catch (Exception e) {
             System.out.println("Problem reading file: " + e.getMessage());
         }
@@ -340,6 +293,7 @@ public class Brickanoid extends YaegerGame {
      *
      * @return true or false
      */
+
     public boolean getPlayerWon() {
         return playerWon;
     }

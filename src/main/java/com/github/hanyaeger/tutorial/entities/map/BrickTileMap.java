@@ -7,7 +7,8 @@ import com.github.hanyaeger.tutorial.entities.brick.PowerupBrick;
 import com.github.hanyaeger.tutorial.entities.brick.SimpleBrick;
 
 /**
- * This class is responsible for associating the different bricks with a tile map
+ * This class is responsible for associating the different bricks with an identifier.
+ * The identifier is used for the brick tile maps.
  *
  * @author Johnny Chen
  * @author Daniël Roth
@@ -21,11 +22,10 @@ public abstract class BrickTileMap extends TileMap {
 
     @Override
     public void setupEntities() {
-        addEntity(1, SimpleBrick.class, "sprites/brickblue.png");
-        addEntity(2, SimpleBrick.class, "sprites/brickgreen.png");
-        addEntity(3, SimpleBrick.class, "sprites/brickpurple.png");
-        addEntity(4, SimpleBrick.class, "sprites/brickyellow.png");
-        // VERANDER DE BRICKBLUEDAMAGED NAAR NORMALE BRICK (was een placeholder voor een powerup voor onderscheiding)
-        addEntity(5, PowerupBrick.class, "sprites/brickbluedamaged.png");
+        addEntity(1, SimpleBrick.class, "sprites/brick1.png");
+        addEntity(2, SimpleBrick.class, "sprites/brick2.png");
+        addEntity(3, SimpleBrick.class, "sprites/brick3.png");
+        addEntity(4, SimpleBrick.class, "sprites/brick4.png");
+        addEntity(5, PowerupBrick.class, "sprites/brick2.png");
     }
 }

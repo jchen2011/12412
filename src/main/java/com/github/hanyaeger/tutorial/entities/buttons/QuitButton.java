@@ -5,7 +5,7 @@ import com.github.hanyaeger.tutorial.Brickanoid;
 import javafx.scene.input.MouseButton;
 
 /**
- * This class is responsible for making the exit button
+ * This class is responsible for making the quit button
  *
  * @author Johnny Chen
  * @author Daniël Roth

@@ -9,7 +9,7 @@ import com.github.hanyaeger.tutorial.entities.buttons.QuitButton;
 import com.github.hanyaeger.tutorial.entities.text.MainText;
 
 /**
- * This class shows the game over scene when there are no lives left anymore or when the game is finished
+ * This class shows the game over scene when the game is finished or when there are no lives left anymore
  *
  * @author Johnny Chen
  * @author Daniël Roth
@@ -24,8 +24,8 @@ public class GameOverScene extends StaticScene {
     @Override
     public void setupScene() {
         setBackgroundAudio("audio/menu_theme.mp3");
-        setBackgroundAudioVolume(0);
-        setBackgroundImage("backgrounds/gameover_bg.jpg");
+        setBackgroundAudioVolume(0.2);
+        setBackgroundImage("backgrounds/gameover_background.jpg");
     }
 
     @Override

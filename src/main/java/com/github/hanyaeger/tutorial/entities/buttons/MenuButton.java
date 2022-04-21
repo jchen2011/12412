@@ -12,7 +12,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 /**
- * This class is representative for every buttons in the menu that inherits the MenuButton class
+ * This class is representative for every button in the menu that inherits from the MenuButton class.
+ * When you hover over the button there will be another color then normal.
  *
  * @author Johnny Chen
  * @author Daniël Roth

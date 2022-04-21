@@ -8,10 +8,13 @@ import com.github.hanyaeger.api.entities.impl.DynamicSpriteEntity;
 import com.github.hanyaeger.tutorial.Brickanoid;
 import com.github.hanyaeger.tutorial.entities.ball.Ball;
 import com.github.hanyaeger.tutorial.entities.randomnumber.RandomNumber;
-import com.github.hanyaeger.tutorial.scenes.dynamicscenes.Level;
 
 /**
- * This class is responsible for making the bricks in the levels
+ * This class is responsible for making the bricks in the levels.
+ * Depending on the brick, the brick will either remove itself or drop a power-up.
+ * When the brick removes itself, you will be rewarded with points, they update after every brick remove.
+ * There are multiple different bricks, so there are hit points and points involved.
+ * You can see the hit points through the saturation/brightness from a brick
  *
  * @author Johnny Chen
  * @author Daniël Roth
@@ -29,9 +32,7 @@ public abstract class Brick extends DynamicSpriteEntity implements Collided, Col
         RandomNumber randomHp = new RandomNumber(LOWEST_HP, HIGHEST_HP);
         this.hitPoints = randomHp.getValue();
         this.scoreValue = SCORE_MULTIPLIER * this.hitPoints;
-        System.out.println(hitPoints);
     }
-
 
     @Override
     public void onCollision(Collider collider) {
@@ -45,12 +46,13 @@ public abstract class Brick extends DynamicSpriteEntity implements Collided, Col
             } else if (hitPoints >= 1) {
                 this.setSaturation(this.getSaturation() - 0.2);
                 this.setBrightness(this.getBrightness() - 0.2);
+                this.setOpacity(this.getOpacity() - 0.05);
             }
         }
     }
 
     /**
-     * Returns the current hit point of a brick
+     * Returns the current amounts of hit points that a brick has
      *
      * @return the amount of hit points
      */
